@@ -19,14 +19,15 @@
   }
 </script>
 <script type="text/javascript">
-    var gl;
-    var shaderProgram;
-    var vertexBuffer;
+    let gl;
+    let shaderProgram;
+    let vertexBuffer;
+
     // установка шейдеров
     function initShaders() {
         // получаем шейдеры
-        var fragmentShader = getShader(gl.FRAGMENT_SHADER, 'shader-fs');
-        var vertexShader = getShader(gl.VERTEX_SHADER, 'shader-vs');
+        const fragmentShader = getShader(gl.FRAGMENT_SHADER, 'shader-fs');
+        const vertexShader = getShader(gl.VERTEX_SHADER, 'shader-vs');
         //создаем объект программы шейдеров
         shaderProgram = gl.createProgram();
         // прикрепляем к ней шейдеры
@@ -47,9 +48,9 @@
     }
     // Функция создания шейдера по типу и id источника в структуре DOM
     function getShader(type,id) {
-        var source = document.getElementById(id).innerHTML;
+        const source = document.getElementById(id).innerHTML;
         // создаем шейдер по типу
-        var shader = gl.createShader(type);
+        const shader = gl.createShader(type);
         // установка источника шейдера
         gl.shaderSource(shader, source);
         // компилируем шейдер
@@ -68,10 +69,10 @@
         vertexBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
         // массив координат вершин объекта
-        var triangleVertices = [
-            0.0,  0.5,  0.0,
-            -0.5, -0.5,  0.0,
-            0.5, -0.5,  0.0
+        const triangleVertices = [
+            0.0, 0.5, 0.0,
+            -0.5, -0.5, 0.0,
+            0.5, -0.5, 0.0
         ];
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(triangleVertices), gl.STATIC_DRAW);
         // указываем кол-во точек
@@ -94,7 +95,7 @@
 
     window.onload=function(){
         // получаем элемент canvas
-        var canvas = document.getElementById("canvas3D");
+        const canvas = document.getElementById("canvas3D");
         try {
             // Сначала пытаемся получить стандартный контекст WegGL
             // Если не получится, обращаемся к экспериментальному контексту
