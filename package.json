@@ -1,0 +1,22 @@
+{
+  "name": "webgl",
+  "version": "1.0.0",
+  "description": "course WebGL",
+  "main": "src/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sekhno/webGL.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sekhno/webGL/issues"
+  },
+  "homepage": "https://github.com/Sekhno/webGL#readme",
+  "dependencies": {
+    "three": "^0.135.0"
+  }
+}
