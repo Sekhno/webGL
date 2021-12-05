@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import fragment from './shaders/fragment.glsl';
-import vertex from './shaders/vertex.glsl'
+import vertex from './shaders/vertex.glsl';
+
+import ocean from '../img/ocean.jpg';
 
 export default class Sketch{
     constructor(options) {
@@ -39,17 +41,19 @@ export default class Sketch{
 
     addObjects(){
         // this.geometry = new THREE.BoxGeometry( 0.4, 0.4, 0.4 );
-        this.geometry = new THREE.PlaneBufferGeometry( 0.5, 0.5, 50, 50 );
+        this.geometry = new THREE.PlaneBufferGeometry( 1, 1, 40, 40 );
+        this.geometry = new THREE.
         this.material = new THREE.MeshNormalMaterial();
 
         this.material = new THREE.ShaderMaterial({
             uniforms: {
-                time: { value: 0 }
+                time: { value: 0 },
+                oceanTexture: { value: new THREE.TextureLoader().load(ocean) }
             },
             side: THREE.DoubleSide,
             fragmentShader: fragment,
             vertexShader: vertex,
-            wireframe: false
+            wireframe: true
         })
 
         this.mesh = new THREE.Mesh( this.geometry, this.material );
