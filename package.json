@@ -18,5 +18,8 @@
   "homepage": "https://github.com/Sekhno/webGL#readme",
   "dependencies": {
     "three": "^0.135.0"
+  },
+  "devDependencies": {
+    "@parcel/transformer-glsl": "^2.0.1"
   }
 }
