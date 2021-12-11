@@ -1,143 +1,73 @@
 import * as THREE from 'three';
-import imagesLoaded from 'imagesloaded';
-import FontFaceObserver from 'fontfaceobserver';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import fragment from './shaders/fragment.glsl';
-import vertex from './shaders/vertex.glsl'
 
-export default class Sketch {
-    constructor(options) {
-        this.time = 0;
-        this.container = options.container;
-        this.width = this.container.offsetWidth;
-        this.heigth = this.container.offsetHeight;
-        this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera( 70, this.width / this.heigth, 100, 2000 );
-        this.camera.position.z = 600;
+function main() {
+    const canvas = document.querySelector('#c');
+    const renderer = new THREE.WebGLRenderer({canvas});
 
-        this.camera.fov = 2 * Math.atan( (this.heigth/2)/600 )* (180/Math.PI)
+    // Далее нам нужна камера.
+    const fov = 75;
+    const aspect = 2;  // значение для canvas по умолчанию
+    const near = 0.1;
+    const far = 5;
+    const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
-        this.renderer = new THREE.WebGLRenderer( {
-            antialias: true,
-            alpha: true
-        } );
+    camera.position.z = 2;
 
-        this.container.appendChild( this.renderer.domElement );
+    const scene = new THREE.Scene();
 
-        this.controls = new OrbitControls( this.camera, this.renderer.domElement );
+    // А пока давайте создадим направленный свет.
+    const color = 0xFFFFFF;
+    const intensity = 1;
+    const light = new THREE.DirectionalLight(color, intensity);
+    light.position.set(-1, 2, 4);
+    scene.add(light);
 
-        this.images = [...document.querySelectorAll('img')];
+    const boxWidth = 1;
+    const boxHeight = 1;
+    const boxDepth = 1;
+    const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
-        const fontOpen = new Promise(resolve => {
-            new FontFaceObserver("Open Sans").load().then(() => {
-                resolve();
-            });
+    const material = new THREE.MeshPhongMaterial({color: 0x44aa88});
+
+    const cubes = [
+        makeInstance(geometry, 0x44aa88,  0),
+        makeInstance(geometry, 0x8844aa, -2),
+        makeInstance(geometry, 0xaa8844,  2),
+    ];
+    // const cube = new THREE.Mesh(geometry, material);
+
+    // scene.add(cubes);
+
+
+
+    // renderer.render(scene, camera);
+    function render(time) {
+        time *= 0.001;  // конвертировать время в секунды
+
+        cubes.forEach((cube, ndx) => {
+            const speed = 1 + ndx * .1;
+            const rot = time * speed;
+            cube.rotation.x = rot;
+            cube.rotation.y = rot;
         });
 
-        const fontPlayfair = new Promise(resolve => {
-            new FontFaceObserver("Playfair Display").load().then(() => {
-                resolve();
-            });
-        });
+        renderer.render(scene, camera);
 
-        // Preload images
-        const preloadImages = new Promise((resolve, reject) => {
-            imagesLoaded(document.querySelectorAll("img"), { background: true }, resolve);
-        });
-
-        let allDone = [fontOpen, fontPlayfair, preloadImages];
-
-        Promise.all(allDone).then(()=>{
-            this.addImages();
-            this.setPosition();
-
-            this.resize();
-            this.setupResize();
-            this.addObjects();
-            this.render();
-        });
+        requestAnimationFrame(render);
     }
+    requestAnimationFrame(render);
 
-    setupResize(){
-        window.addEventListener('resize', this.resize.bind(this))
-    }
+    function makeInstance(geometry, color, x) {
+        const material = new THREE.MeshPhongMaterial({color});
 
-    resize(){
-        this.width = this.container.offsetWidth;
-        this.heigth = this.container.offsetHeight;
-        this.renderer.setSize( this.width, this.heigth );
-        this.camera.aspect = this.width / this.heigth;
-        this.camera.updateProjectionMatrix();
-    }
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
 
-    addImages() {
-        this.imagesStore = this.images.map(img=>{
-            let bounds = img.getBoundingClientRect();
+        cube.position.x = x;
 
-            let geometry = new THREE.PlaneBufferGeometry(bounds.width, bounds.height, 1, 1);
-            let texture = new THREE.Texture(img);
-            texture.needsUpdate = true;
-            // texture.needsUpdate = true;
-            let material = new THREE.MeshBasicMaterial({
-                color: 0xff0000,
-                map: texture
-            });
-
-            let mesh = new THREE.Mesh(geometry, material);
-
-            this.scene.add(mesh)
-
-            return {
-                img: img,
-                mesh: mesh,
-                top: bounds.top,
-                left: bounds.left,
-                width: bounds.width,
-                height: bounds.height
-            }
-        });
-
-        console.log(this.imagesStore)
-    }
-
-    setPosition(){
-        this.imagesStore.forEach(o=>{
-            o.mesh.position.y = -o.top + this.heigth/2 - o.height/2;
-            o.mesh.position.x = o.left - this.width/2 + o.width/2;
-        })
-    }
-
-    addObjects(){
-        // this.geometry = new THREE.BoxGeometry( 0.4, 0.4, 0.4 );
-        // this.geometry = new THREE.SphereBufferGeometry(0.4, 40, 40);
-        this.geometry = new THREE.PlaneBufferGeometry( 200, 400, 10, 10 );
-        this.material = new THREE.MeshNormalMaterial();
-
-        this.material = new THREE.ShaderMaterial({
-            uniforms: {
-                time: { value: 0 }
-            },
-            side: THREE.DoubleSide,
-            fragmentShader: fragment,
-            vertexShader: vertex,
-            wireframe: true
-        })
-
-        this.mesh = new THREE.Mesh( this.geometry, this.material );
-        this.scene.add( this.mesh );
-    }
-
-    render(){
-        this.time += 0.05;
-        this.mesh.rotation.x = this.time / 2000;
-        this.mesh.rotation.y = this.time / 1000;
-
-        this.material.uniforms.time.value = this.time;
-        this.renderer.render( this.scene, this.camera );
-        window.requestAnimationFrame(this.render.bind(this))
+        return cube;
     }
 }
 
-new Sketch({
-    container: document.getElementById('container')
-});
+main();
+
