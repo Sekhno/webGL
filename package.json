@@ -19,6 +19,7 @@
   "dependencies": {
     "fontfaceobserver": "^2.1.0",
     "imagesloaded": "^4.1.4",
+    "lil-gui": "^0.15.0",
     "three": "^0.135.0"
   },
   "devDependencies": {
